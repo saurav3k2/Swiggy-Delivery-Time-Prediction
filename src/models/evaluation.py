@@ -7,7 +7,12 @@ from pathlib import Path
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_absolute_error, r2_score
 import json
+import sys
 
+
+for stream in (sys.stdout, sys.stderr):
+    if hasattr(stream, "reconfigure"):
+        stream.reconfigure(encoding="utf-8")
 
 # initialize dagshub
 import dagshub
@@ -60,11 +65,12 @@ def load_model(model_path: Path):
     return model
 
 
-def save_model_info(save_json_path,run_id, artifact_path, model_name):
+def save_model_info(save_json_path, run_id, artifact_path, model_name, model_uri):
     info_dict = {
         "run_id": run_id,
         "artifact_path": artifact_path,
-        "model_name": model_name
+        "model_name": model_name,
+        "model_uri": model_uri
     }
     with open(save_json_path,"w") as f:
         json.dump(info_dict,f,indent=4)
@@ -78,6 +84,7 @@ if __name__ == "__main__":
     test_data_path = root_path / "data" / "processed" / "test_trans.csv"
     # model path
     model_path = root_path / "models" / "model.joblib"
+    model_name = "delivery_time_pred_model"
     
     
     # load the training data
@@ -155,8 +162,8 @@ if __name__ == "__main__":
                                     model_output=model.predict(X_train.sample(20,random_state=42)))
         
         # log the final model
-        mlflow.sklearn.log_model(model,"delivery_time_pred_model",signature=model_signature)
-
+        logged_model = mlflow.sklearn.log_model(model, name=model_name, signature=model_signature)
+        
         # log stacking regressor
         mlflow.log_artifact(root_path / "models" / "stacking_regressor.joblib")
         
@@ -173,14 +180,15 @@ if __name__ == "__main__":
         
     # get the run id 
     run_id = run.info.run_id
-    model_name = "delivery_time_pred_model"
+    model_uri = logged_model.model_uri
     
     # save the model info
     save_json_path = root_path / "run_information.json"
     save_model_info(save_json_path=save_json_path,
                     run_id=run_id,
                     artifact_path=artifact_uri,
-                    model_name=model_name)
+                    model_name=model_name,
+                    model_uri=model_uri)
     logger.info("Model Information saved")
     
     
