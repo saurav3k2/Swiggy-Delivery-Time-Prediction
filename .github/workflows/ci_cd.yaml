@@ -1,28 +1,31 @@
 name: CI-CD
 
-on: push
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+on:
+  push:
 
 jobs:
   CI-CD:
     runs-on: ubuntu-latest
-    steps:
-      - name: Code Checkout
-        uses: actions/checkout@v6
 
+    steps:
+      # 1. Checkout
+      - name: Code Checkout
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip' 
+          cache: 'pip'
 
+      # 3. Install dependencies
       - name: Install Packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
+      # 4. Configure AWS (ONLY ONCE)
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v5
         with:
@@ -30,10 +33,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
+      # 5. DVC Pull (with auth fix)
       - name: DVC Pull
+        env:
+          DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_PAT }}
         run: |
-          dvc pull
+          dvc pull --allow-missing
 
+      # 6. Tests
       - name: Test Model Registry
         env:
           DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_PAT }}
@@ -46,30 +53,24 @@ jobs:
         run: |
           pytest tests/test_model_perf.py
 
+      # 7. Promote model
       - name: Promote Model
         if: success()
         env:
           DAGSHUB_USER_TOKEN: ${{ secrets.DAGSHUB_PAT }}
         run: |
           python scripts/promote_model_to_prod.py
-          
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
-     
+      # 8. Login to ECR
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-  
+      # 9. Build and Push Docker Image (FIXED)
       - name: Build, tag, and push docker image to Amazon ECR
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: ${{ secrets.ECR_REPOSITORY_URI }}
+          REPOSITORY: food_delivery_time_pred   # ✅ FIXED (ONLY NAME, NOT URI)
           IMAGE_TAG: latest
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
