@@ -26,6 +26,7 @@ dagshub_token = (
 )
 if dagshub_token:
     os.environ["DAGSHUB_USER_TOKEN"] = dagshub_token
+    dagshub.auth.add_app_token(dagshub_token)
 
 dagshub.init(repo_owner='saurav3k2', 
              repo_name='Swiggy-Delivery-Time-Prediction',
