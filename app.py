@@ -6,6 +6,7 @@ import pandas as pd
 import mlflow
 import json
 import joblib
+import os
 from mlflow import MlflowClient
 from sklearn import set_config
 from scripts.data_clean_utils import perform_data_cleaning
@@ -16,6 +17,15 @@ set_config(transform_output='pandas')
 # initialize dagshub
 import dagshub
 import mlflow.client
+
+# Support multiple token env var names in non-interactive runtimes.
+dagshub_token = (
+    os.getenv("DAGSHUB_USER_TOKEN")
+    or os.getenv("DAGSHUB_PAT")
+    or os.getenv("DAGSHUB_TOKEN")
+)
+if dagshub_token:
+    os.environ["DAGSHUB_USER_TOKEN"] = dagshub_token
 
 dagshub.init(repo_owner='saurav3k2', 
              repo_name='Swiggy-Delivery-Time-Prediction',
@@ -85,10 +95,10 @@ client = MlflowClient()
 model_name = load_model_information("run_information.json")['model_name']
 
 # stage of the model
-stage = "Staging"
+stage = "Production"
 
 # get the latest model version
-latest_model_ver = client.get_latest_versions(name=model_name,stages=[stage])
+#latest_model_ver = client.get_latest_versions(name=model_name,stages=[stage])
 # print(f"Latest model in production is version {latest_model_ver[0].version}")
 
 # load model path
