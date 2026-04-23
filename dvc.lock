@@ -30,27 +30,27 @@ stages:
     params:
       params.yaml:
         Data_Preparation.random_state: 4
-        Data_Preparation.test_size: 0.2
+        Data_Preparation.test_size: 0.25
     outs:
     - path: data/interim/test.csv
       hash: md5
-      md5: d017ae06d6e6ec7ac0271db7be3431ac
-      size: 900876
+      md5: 363cf8ae9cfc18383a15b367de3d6427
+      size: 1126069
     - path: data/interim/train.csv
       hash: md5
-      md5: 96602db6994186adda5aafac39faccd5
-      size: 3604693
+      md5: d7474305c2fd5a339f6da4aaf49bd308
+      size: 3379500
   data_preprocessing:
     cmd: python src/features/data_preprocessing.py
     deps:
     - path: data/interim/test.csv
       hash: md5
-      md5: d017ae06d6e6ec7ac0271db7be3431ac
-      size: 900876
+      md5: 363cf8ae9cfc18383a15b367de3d6427
+      size: 1126069
     - path: data/interim/train.csv
       hash: md5
-      md5: 96602db6994186adda5aafac39faccd5
-      size: 3604693
+      md5: d7474305c2fd5a339f6da4aaf49bd308
+      size: 3379500
     - path: src/features/data_preprocessing.py
       hash: md5
       md5: 3bf8b0711802e798b3c0622da3300aee
@@ -58,23 +58,23 @@ stages:
     outs:
     - path: data/processed/test_trans.csv
       hash: md5
-      md5: fd1c5a3ecfdbfd1f96f5b7d68264c0d5
-      size: 1084266
+      md5: a4ca137712a72970fd19d36d24e307b1
+      size: 1355350
     - path: data/processed/train_trans.csv
       hash: md5
-      md5: 5409db596f2d4f029debb167b19c040c
-      size: 4334467
+      md5: f23bf258d7e3865bdff9578e95bb3cb5
+      size: 4063383
     - path: models/preprocessor.joblib
       hash: md5
-      md5: 02ed6d17043dcf7b2949246b4cc041d0
+      md5: debfd544eaebf56cabf8d7af6915134b
       size: 7243
   train:
     cmd: python src/models/train.py
     deps:
     - path: data/processed/train_trans.csv
       hash: md5
-      md5: 5409db596f2d4f029debb167b19c040c
-      size: 4334467
+      md5: f23bf258d7e3865bdff9578e95bb3cb5
+      size: 4063383
     - path: src/models/train.py
       hash: md5
       md5: 7b58ff98727eeac3d4f78318ade236c5
@@ -103,31 +103,31 @@ stages:
     outs:
     - path: models/model.joblib
       hash: md5
-      md5: a8eedaa1068004837bac0e82dd21eba8
-      size: 59505608
+      md5: 51e89d42c7bcfe4120f3c2377191f563
+      size: 55919128
     - path: models/power_transformer.joblib
       hash: md5
-      md5: 05e8fb69b02e6733ec2fb253e171b34f
+      md5: 9b35e54d5fc89e5ab2e32123ab16399d
       size: 805
     - path: models/stacking_regressor.joblib
       hash: md5
-      md5: 6f9a0176bc699531ebe8accbc3a9e4da
-      size: 59495386
+      md5: 6ddcb576a38cb4c221068dfca890bca2
+      size: 55908906
   evaluation:
     cmd: python src/models/evaluation.py
     deps:
     - path: data/processed/test_trans.csv
       hash: md5
-      md5: fd1c5a3ecfdbfd1f96f5b7d68264c0d5
-      size: 1084266
+      md5: a4ca137712a72970fd19d36d24e307b1
+      size: 1355350
     - path: data/processed/train_trans.csv
       hash: md5
-      md5: 5409db596f2d4f029debb167b19c040c
-      size: 4334467
+      md5: f23bf258d7e3865bdff9578e95bb3cb5
+      size: 4063383
     - path: models/model.joblib
       hash: md5
-      md5: a8eedaa1068004837bac0e82dd21eba8
-      size: 59505608
+      md5: 51e89d42c7bcfe4120f3c2377191f563
+      size: 55919128
     - path: src/models/evaluation.py
       hash: md5
       md5: 05318479edc770286228847ec4c6e517
@@ -135,14 +135,14 @@ stages:
     outs:
     - path: run_information.json
       hash: md5
-      md5: f237e60e874106b2092532bdb8d040e3
+      md5: 88b13e7f8733501ba7d847f7fc59548c
       size: 284
   register_model:
     cmd: python src/models/register_model.py
     deps:
     - path: run_information.json
       hash: md5
-      md5: f237e60e874106b2092532bdb8d040e3
+      md5: 88b13e7f8733501ba7d847f7fc59548c
       size: 284
     - path: src/models/register_model.py
       hash: md5
