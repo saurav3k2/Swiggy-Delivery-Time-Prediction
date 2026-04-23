@@ -1,6 +1,6 @@
 {
-    "run_id": "760e6fd02c62497fbb4622620e427679",
-    "artifact_path": "mlflow-artifacts:/a0c8b279fd8545ab9cb2d3aaf44abde2/760e6fd02c62497fbb4622620e427679/artifacts",
+    "run_id": "956478c1ade64e52a292f1b3097c7a91",
+    "artifact_path": "mlflow-artifacts:/a0c8b279fd8545ab9cb2d3aaf44abde2/956478c1ade64e52a292f1b3097c7a91/artifacts",
     "model_name": "delivery_time_pred_model",
-    "model_uri": "models:/m-3cb2dd8d322f41dcaf687edb1c8db79b"
+    "model_uri": "models:/m-7669ea284f124a13bc051c136bdb9782"
 }
