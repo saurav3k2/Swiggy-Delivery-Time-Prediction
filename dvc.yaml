@@ -51,7 +51,8 @@ stages:
     - data/processed/test_trans.csv
     - models/model.joblib
     outs:
-    - run_information.json
+    - run_information.json:
+        cache: false
 
   register_model:
     cmd: python src/models/register_model.py
